@@ -15,9 +15,9 @@ grouped GEMM operations to process all experts in parallel.
 Install the fused kernel package:
 
 ```bash
-pip install qwen3-moe-fused
-# or from source:
 pip install git+https://github.com/woct0rdho/transformers-qwen3-moe-fused.git
+# or via LLaMA-Factory extras:
+pip install llamafactory[qwen3-moe-fused]
 ```
 
 ## Usage
@@ -72,7 +72,7 @@ For QLoRA (4-bit quantization), uncomment the quantization settings in the confi
 ## Troubleshooting
 
 **Kernel not applied**: Check that:
-- `qwen3-moe-fused` is installed: `pip show qwen3-moe-fused`
+- `qwen3-moe-fused` is installed: `python -c "import qwen3_moe_fused; print('OK')"`
 - `use_v1_kernels: true` is set in your config
 - You're using a CUDA GPU
 - Model architecture is `Qwen3MoeForCausalLM`

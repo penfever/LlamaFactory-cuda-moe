@@ -5,8 +5,7 @@
 ### single 24GB GPU.
 ###
 ### Prerequisites:
-###   pip install qwen3-moe-fused bitsandbytes
-###   # or: pip install git+https://github.com/woct0rdho/transformers-qwen3-moe-fused.git
+###   pip install git+https://github.com/woct0rdho/transformers-qwen3-moe-fused.git bitsandbytes
 ###
 ### Usage:
 ###   llamafactory-cli train examples/extras/fused_moe/qwen3_moe_fused_lora.yaml

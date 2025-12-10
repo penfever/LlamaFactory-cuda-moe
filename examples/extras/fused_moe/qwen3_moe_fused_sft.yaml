@@ -4,8 +4,7 @@
 ### for ~5x speedup over the default HuggingFace implementation.
 ###
 ### Prerequisites:
-###   pip install qwen3-moe-fused
-###   # or: pip install git+https://github.com/woct0rdho/transformers-qwen3-moe-fused.git
+###   pip install git+https://github.com/woct0rdho/transformers-qwen3-moe-fused.git
 ###
 ### Usage:
 ###   llamafactory-cli train examples/extras/fused_moe/qwen3_moe_fused_sft.yaml
