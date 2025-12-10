@@ -58,6 +58,7 @@ extra_require = {
     "apollo": ["apollo-torch"],
     "badam": ["badam>=1.2.1"],
     "adam-mini": ["adam-mini"],
+    "qwen3-moe-fused": ["qwen3-moe-fused"],
     "minicpm_v": [
         "soundfile",
         "torchvision",

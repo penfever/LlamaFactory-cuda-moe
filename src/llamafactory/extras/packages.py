@@ -122,3 +122,7 @@ def is_uvicorn_available():
 
 def is_vllm_available():
     return _is_package_available("vllm")
+
+
+def is_qwen3_moe_fused_available():
+    return _is_package_available("qwen3_moe_fused")

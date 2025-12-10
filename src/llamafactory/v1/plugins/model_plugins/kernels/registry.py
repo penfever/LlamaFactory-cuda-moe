@@ -168,6 +168,7 @@ def _ensure_kernels_loaded() -> None:
         "rope.npu_rope",
         "mlp.npu_swiglu",
         "mlp.npu_fused_moe",
+        "mlp.cuda_fused_moe",
         # Add new kernel modules here as they are created
     ]
 
