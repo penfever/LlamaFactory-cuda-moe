@@ -49,6 +49,7 @@ logging_strategy: steps
 plot_loss: true
 
 ### Training hyperparameters
+pure_bf16: true
 per_device_train_batch_size: 1
 gradient_accumulation_steps: 8
 learning_rate: 4.0e-5
