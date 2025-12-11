@@ -59,6 +59,20 @@ class CudaMoeFused:
         return gate_weights, up_weights, down_weights
 
     @staticmethod
+    def prepare_fused_weights(moe_block: "nn.Module") -> None:
+        """
+        Pre-stack expert weights into fused format.
+
+        This MUST be called before DeepSpeed initialization to avoid
+        registering new buffers during forward pass which causes NCCL hangs.
+        """
+        gate_w, up_w, down_w = CudaMoeFused._stack_expert_weights(moe_block.experts)
+        # Register as buffers so they move with the model
+        moe_block.register_buffer('_fused_gate_weight', gate_w, persistent=False)
+        moe_block.register_buffer('_fused_up_weight', up_w, persistent=False)
+        moe_block.register_buffer('_fused_down_weight', down_w, persistent=False)
+
+    @staticmethod
     def qwen3moe_sparse_moe_block_forward(self, hidden_states: torch.Tensor):
         """
         Fused forward pass for Qwen3MoeSparseMoeBlock.
@@ -95,15 +109,7 @@ class CudaMoeFused:
         m_sizes, sort_idx, inv_sort_idx = get_expert_counts_and_idx(selected_experts, self.num_experts)
         hidden_states = hidden_states[sort_idx]
 
-        # Stack expert weights if not already cached
-        if not hasattr(self, '_fused_gate_weight'):
-            gate_w, up_w, down_w = CudaMoeFused._stack_expert_weights(self.experts)
-            # Register as buffers so they move with the model
-            self.register_buffer('_fused_gate_weight', gate_w, persistent=False)
-            self.register_buffer('_fused_up_weight', up_w, persistent=False)
-            self.register_buffer('_fused_down_weight', down_w, persistent=False)
-
-        # Fused computation
+        # Fused computation (weights pre-stacked in prepare_fused_weights)
         gate_h = moe_fused_linear(hidden_states, self._fused_gate_weight, m_sizes)
         up_h = moe_fused_linear(hidden_states, self._fused_up_weight, m_sizes)
         hidden_states = F.silu(gate_h) * up_h
@@ -174,11 +180,14 @@ class CudaFusedMoEKernel(MetaMoEKernel):
         if target_moe_mapping is None:
             return model
 
-        # Patch forward methods
+        # Patch forward methods and pre-stack weights
         patched_count = 0
         for module in model.modules():
             class_name = module.__class__.__name__
             if class_name in target_moe_mapping:
+                # Pre-stack expert weights BEFORE DeepSpeed initialization
+                # This avoids registering new buffers during forward which causes NCCL hangs
+                CudaMoeFused.prepare_fused_weights(module)
                 new_forward_func = target_moe_mapping[class_name]
                 module.forward = types.MethodType(new_forward_func, module)
                 patched_count += 1
