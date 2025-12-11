@@ -32,7 +32,7 @@ deepspeed: examples/deepspeed/ds_z2_config.json  # Use ZeRO-2 for MoE (ZeRO-3 in
 ### Replace with your dataset
 dataset: identity
 template: qwen3
-cutoff_len: 32768
+cutoff_len: 4096
 overwrite_cache: true
 preprocessing_num_workers: 16
 dataloader_persistent_workers: true
